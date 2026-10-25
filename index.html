@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pulse Ops</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Crect width='20' height='20' rx='5' fill='%23006ce0'/%3E%3Cpath d='M3 10h3l2-4.5 3.5 9 2-4.5H17' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"
+    />
+
+    <!-- real Cloudscape reset + Open Sans font, no bundler required -->
+    <link rel="stylesheet" href="https://unpkg.com/@cloudscape-design/global-styles@1.0.71/index.css" />
+    <link rel="stylesheet" href="./src/styles/main.css" />
+
+    <!-- import map keeps bare imports browser-native without a build step -->
+    <script type="importmap">
+      {
+        "imports": {
+          "preact": "https://esm.sh/preact@10.26.4",
+          "preact/hooks": "https://esm.sh/preact@10.26.4/hooks",
+          "htm/preact": "https://esm.sh/htm@3.1.1/preact?external=preact",
+          "@preact/signals": "https://esm.sh/@preact/signals@2.0.1?external=preact,preact/hooks",
+          "@cloudscape-design/design-tokens": "https://cdn.jsdelivr.net/npm/@cloudscape-design/design-tokens@3.0.116/+esm",
+          "@cloudscape-design/global-styles": "https://cdn.jsdelivr.net/npm/@cloudscape-design/global-styles@1.0.71/+esm",
+          "d3": "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <!-- applies saved theme/density before the CDN modules load, avoids a light flash -->
+    <script>
+      (function () {
+        function read(key, fallback) {
+          try {
+            var raw = localStorage.getItem("pulse:" + key);
+            return raw === null ? fallback : JSON.parse(raw);
+          } catch (error) {
+            return fallback;
+          }
+        }
+        var theme = read("theme", "system");
+        var dark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+        document.body.classList.toggle("awsui-dark-mode", dark);
+        document.body.classList.toggle("awsui-compact-mode", read("compact", false));
+      })();
+    </script>
+
+    <div id="app"><div class="boot" role="status">Loading console...</div></div>
+    <noscript>Pulse Ops needs JavaScript to run.</noscript>
+
+    <!-- main module entry point -->
+    <script type="module" src="./index.js"></script>
+  </body>
+</html>
