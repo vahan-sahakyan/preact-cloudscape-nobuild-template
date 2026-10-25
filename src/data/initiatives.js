@@ -1,6 +1,0 @@
-export const initiatives = [
-  { id: "I-21", title: "Launch pricing experiment for teams", owner: "L. Howard", status: "In progress", tone: "info", progress: 64, due: "2026-11-14" },
-  { id: "I-22", title: "Improve onboarding completion funnel", owner: "M. Diallo", status: "Planned", tone: "pending", progress: 10, due: "2026-12-05" },
-  { id: "I-23", title: "Expand referral rewards to EMEA", owner: "J. Lindqvist", status: "In review", tone: "warning", progress: 85, due: "2026-11-02" },
-  { id: "I-24", title: "Ship churn prediction score v2", owner: "A. Petrosyan", status: "In progress", tone: "info", progress: 42, due: "2026-12-19" }
-];

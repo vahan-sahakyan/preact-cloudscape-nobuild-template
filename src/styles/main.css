@@ -462,11 +462,27 @@ body.awsui-dark-mode .top-nav {
 
 /* app layout */
 
+/* app-like: long-press on touch must not select whole panels or open the callout menu */
 .app-shell {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   padding-bottom: var(--footer-height);
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* text people copy stays selectable */
+.app-shell input,
+.app-shell textarea,
+.note p,
+.detail-list dd,
+.help-panel-body {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
 }
 
 .app-body {
@@ -1968,6 +1984,19 @@ body.awsui-dark-mode .toggle-switch.is-on .toggle-knob {
   position: relative;
   width: 100%;
   min-width: 0;
+  /* vertical swipes still scroll the page, horizontal drags scrub the chart */
+  touch-action: pan-y;
+}
+
+/* svg text ignores inherited user-select in Safari, so every chart node opts out itself */
+.chart-host,
+.chart-host *,
+.sparkline,
+.sparkline * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
 }
 
 .chart-host svg {
