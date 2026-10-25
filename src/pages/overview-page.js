@@ -9,21 +9,12 @@ import { Keys, ProgressBar, StatusIndicator } from "../components/ui.js";
 import { MetricLineChart } from "../components/charts/metric-line.js";
 import { BarListChart } from "../components/charts/bar-list.js";
 import { RegionDonutChart } from "../components/charts/region-donut.js";
-import { channels, regions, rangeOptions } from "../data/metrics.js";
+import { channels, rangeOptions } from "../data/metrics.js";
 import { healthTone } from "../data/customers.js";
 import { seed } from "../data/api.js";
 import { accounts } from "../state/accounts-signals.js";
-import {
-  monthsBack,
-  compareEnabled,
-  selectedKpiId,
-  kpiSummaries,
-  activeKpi,
-  hoveredRegion,
-  selectedRegion,
-  focusRegion,
-  toggleRegion
-} from "../state/dashboard-signals.js";
+import { monthsBack, compareEnabled, selectedKpiId, hoveredRegion, selectedRegion, focusRegion, toggleRegion } from "../state/dashboard-signals.js";
+import { revenueSummaries, productSummaries, activeKpi, regionShares } from "../state/metrics-signals.js";
 import { paletteOpen, welcomeDismissed } from "../state/ui-signals.js";
 import { formatMetric, formatCurrencyCompact, formatTimeUntil } from "../lib/format.js";
 import { modKey } from "../hooks/use-hotkeys.js";
@@ -62,14 +53,20 @@ function WelcomeAlert() {
   `;
 }
 
+function scopeLabel(region) {
+  return region ? `in ${region}` : "across all regions";
+}
+
 function MetricPanel() {
   const kpi = activeKpi.value;
   const compare = compareEnabled.value;
+  const isRevenue = revenueSummaries.value.some((item) => item.id === kpi.id);
+  const source = isRevenue ? `From account records ${scopeLabel(selectedRegion.value)}` : "From product analytics, all regions";
 
   return html`
     <${Panel}
       title=${`${kpi.label} trend`}
-      description=${`${formatMetric(kpi.value, kpi.format)} now, target ${formatMetric(kpi.target, kpi.format)}`}
+      description=${`${formatMetric(kpi.value, kpi.format)} now, target ${formatMetric(kpi.target, kpi.format)}. ${source}.`}
       actions=${html`
         <${Toggle}
           label="Compare to previous period"
@@ -98,9 +95,9 @@ function MetricPanel() {
 
 function RegionPanel() {
   return html`
-    <${Panel} class="donut-panel" title="Regional footprint" description="Customer share by region. Select one to scope the console.">
+    <${Panel} class="donut-panel" title="Regional footprint" description="Share of paying MRR by region, from account records. Select one to scope the console.">
       <${RegionDonutChart}
-        regions=${regions}
+        regions=${regionShares.value}
         focused=${focusRegion.value}
         pinned=${selectedRegion.value}
         onHover=${onRegionHover}
@@ -188,7 +185,9 @@ export function OverviewPage() {
     <${PageHeader}
       title="Overview"
       info="overview"
-      description=${selectedRegion.value ? `Growth and engagement in ${selectedRegion.value}` : "Growth and engagement across all regions"}
+      description=${selectedRegion.value
+        ? `Revenue for ${selectedRegion.value} from account records, product analytics for the whole user base`
+        : "Revenue from account records, product analytics for the whole user base"}
       actions=${html`
         <${SegmentedControl}
           label="Time range"
@@ -202,7 +201,26 @@ export function OverviewPage() {
       `}
     />
 
-    <${KpiStrip} kpis=${kpiSummaries.value} selectedId=${selectedKpiId.value} monthsBack=${monthsBack.value} onSelect=${onKpiSelect} />
+    <div class="grid-halves">
+      <${KpiStrip}
+        title="Revenue"
+        info="revenue"
+        description=${`From account records ${scopeLabel(selectedRegion.value)}, live`}
+        kpis=${revenueSummaries.value}
+        selectedId=${selectedKpiId.value}
+        monthsBack=${monthsBack.value}
+        onSelect=${onKpiSelect}
+      />
+      <${KpiStrip}
+        title="Product analytics"
+        info="product"
+        description="Usage across the whole user base, all regions"
+        kpis=${productSummaries.value}
+        selectedId=${selectedKpiId.value}
+        monthsBack=${monthsBack.value}
+        onSelect=${onKpiSelect}
+      />
+    </div>
 
     <div class="grid-main">
       <${MetricPanel} />
@@ -210,7 +228,7 @@ export function OverviewPage() {
     </div>
 
     <div class="grid-auto">
-      <${Panel} title="Acquisition mix" description="Share of converted signups by channel">
+      <${Panel} title="Acquisition mix" description="Product analytics: share of converted signups by channel">
         <${BarListChart} items=${channels} format="percent" label="Acquisition mix by channel" />
       <//>
       <${RegionPanel} />

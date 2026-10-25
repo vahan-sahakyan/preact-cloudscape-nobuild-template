@@ -1,18 +1,25 @@
 {
-  "kpis": [
+  "revenue": [
     {
       "id": "revenue",
       "label": "MRR",
       "format": "currency",
-      "target": 200000,
-      "series": {
-        "seed": 11,
-        "end": 184200,
-        "drift": 0.02,
-        "noise": 0.024,
-        "relative": true
-      }
+      "target": 100000
     },
+    {
+      "id": "payingAccounts",
+      "label": "Paying accounts",
+      "format": "number",
+      "target": 24
+    },
+    {
+      "id": "arpa",
+      "label": "Avg MRR per account",
+      "format": "currency",
+      "target": 5000
+    }
+  ],
+  "product": [
     {
       "id": "activeUsers",
       "label": "Active users",
@@ -73,24 +80,6 @@
     {
       "name": "Outbound",
       "value": 4.8
-    }
-  ],
-  "regions": [
-    {
-      "name": "North America",
-      "value": 41
-    },
-    {
-      "name": "Europe",
-      "value": 29
-    },
-    {
-      "name": "APAC",
-      "value": 19
-    },
-    {
-      "name": "LATAM",
-      "value": 11
     }
   ]
 }

@@ -21,10 +21,10 @@ function MetricColumn({ kpi, selected, monthsBack, onSelect }) {
 }
 
 // Cloudscape ColumnLayout with vertical borders, each column selects the charted metric
-export function KpiStrip({ kpis, selectedId, monthsBack, onSelect, actions }) {
+export function KpiStrip({ title, description, info, kpis, selectedId, monthsBack, onSelect, actions }) {
   return html`
-    <${Panel} title="Key metrics" info="metrics" description="Select a metric to chart it below" actions=${actions}>
-      <div class="metric-columns">
+    <${Panel} class="kpi-panel" title=${title} info=${info} description=${description} actions=${actions}>
+      <div class="metric-columns" style=${{ "--columns": kpis.length }}>
         ${kpis.map(
           (kpi) => html`
             <${MetricColumn} key=${kpi.id} kpi=${kpi} selected=${kpi.id === selectedId} monthsBack=${monthsBack} onSelect=${onSelect} />

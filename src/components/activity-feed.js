@@ -31,7 +31,7 @@ function FeedItem({ event, clock }) {
 export function ActivityFeed({ region }) {
   const live = liveUpdates.value;
   const clock = now.value;
-  const items = events.value.filter((event) => !region || event.region === region);
+  const items = events.value.filter((event) => !region || event.region === region).slice(0, 50);
 
   return html`
     <${Panel}

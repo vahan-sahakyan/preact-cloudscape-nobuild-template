@@ -2,18 +2,12 @@
   "overview": {
     "title": "Overview",
     "body": [
-      "Key metrics summarize the selected time range. Choose a metric to chart it, and turn on Compare to overlay the previous period of the same length.",
-      "Deltas compare the latest month with the month before the range starts. Percent metrics change in percentage points (pp)."
+      "Revenue metrics are derived from the account records and move live with account activity. Product analytics describe the whole user base and come from their own data.",
+      "Select a metric to chart it, and turn on Compare to overlay the previous period. Deltas compare the latest month with the month before the range starts; percent metrics change in percentage points (pp)."
     ],
     "items": [
-      "Select a region on the donut or in the top navigation to filter accounts and activity.",
+      "The region selector in the top navigation, or the donut, scopes revenue, accounts and activity. Product analytics are not split by region.",
       "Hover the trend chart, or focus it and use the arrow keys, to inspect months."
-    ]
-  },
-  "metrics": {
-    "title": "Key metrics",
-    "body": [
-      "MRR is monthly recurring revenue. Trial conversion is the share of trials that became paid within 30 days. D30 retention is the share of new users still active 30 days after signup."
     ]
   },
   "activity": {
@@ -43,14 +37,27 @@
   "analytics": {
     "title": "Analytics",
     "body": [
-      "The funnel shows each step's conversion from the one before and from the top of the funnel. Tabs split it by acquisition channel.",
-      "Cohort retention shows the share of each monthly signup cohort still active in later months. MRR movement breaks last month's net change into new, expansion, contraction and churn."
+      "Revenue shows where MRR changed over the last 30 days and how it splits by plan, from account records. Product analytics cover the signup funnel and cohort retention for the whole user base."
     ]
   },
   "settings": {
     "title": "Settings",
     "body": [
       "Theme, density and motion call Cloudscape's applyMode, applyDensity and disableMotion helpers. All preferences are stored in this browser."
+    ]
+  },
+  "revenue": {
+    "title": "Revenue",
+    "body": [
+      "MRR is the sum of paying accounts' monthly recurring revenue; trials are excluded. Paying accounts counts accounts with MRR in a month, and average MRR per account divides the two.",
+      "The current month is live: upgrades, seat changes and conversions in the activity feed update it immediately. Earlier months are generated history for each account.",
+      "MRR movement groups the last 30 days of account events: conversions are new, upgrades and added seats are expansion, removed seats are contraction."
+    ]
+  },
+  "product": {
+    "title": "Product analytics",
+    "body": [
+      "Active users, trial conversion, D30 retention, acquisition mix, the signup funnel and cohort retention describe the whole user base. The account records do not model users or signups, so these come from their own data and are not split by region."
     ]
   }
 }

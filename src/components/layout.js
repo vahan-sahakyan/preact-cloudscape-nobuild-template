@@ -28,6 +28,16 @@ export function PageHeader({ title, counter, info, description, actions, childre
   `;
 }
 
+// Cloudscape Header variant="h2", groups the containers below it
+export function SectionHeader({ title, info, description }) {
+  return html`
+    <header class="section-header">
+      <${Heading} level="h2" title=${title} info=${info} />
+      ${description ? html`<p class="page-description">${description}</p>` : null}
+    </header>
+  `;
+}
+
 // Cloudscape Container with an h2 header and an optional footer
 export function Panel({ title, counter, info, description, actions, footer, class: className = "", children }) {
   return html`

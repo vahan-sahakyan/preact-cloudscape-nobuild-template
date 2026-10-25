@@ -5,7 +5,7 @@ import { EmptyState, KeyValue, ProgressBar, StatusIndicator } from "../component
 import { ButtonDropdown } from "../components/button-dropdown.js";
 import { Toggle } from "../components/toggle-switch.js";
 import { TrendSparkline } from "../components/trend-sparkline.js";
-import { statusTone, planOrder, healthTone, isAtRisk, getCustomerTrend } from "../data/customers.js";
+import { statusTone, planOrder, healthTone, isAtRisk, getAccountHistory } from "../data/customers.js";
 import { accounts, owners } from "../state/accounts-signals.js";
 import {
   PAGE_SIZE,
@@ -52,7 +52,9 @@ const columns = [
 
 
 function Summary({ rows }) {
-  const totalMrr = rows.reduce((sum, customer) => sum + customer.mrr, 0);
+  // same definition as the Revenue metrics: paying accounts only
+  const totalMrr = rows.reduce((sum, customer) => sum + (customer.status === "trial" ? 0 : customer.mrr), 0);
+  const trials = rows.filter((customer) => customer.status === "trial").length;
   const atRisk = rows.filter(isAtRisk);
   const atRiskMrr = atRisk.reduce((sum, customer) => sum + customer.mrr, 0);
   const avgHealth = rows.length ? Math.round(rows.reduce((sum, customer) => sum + customer.health, 0) / rows.length) : 0;
@@ -61,7 +63,11 @@ function Summary({ rows }) {
     <${Panel} title="Summary" description="Totals for the accounts matching the current filters">
       <div class="column-layout">
         <${KeyValue} label="Accounts" value=${rows.length} hint=${`of ${accounts.value.length} total`} />
-        <${KeyValue} label="Total MRR" value=${formatCurrencyCompact(totalMrr)} hint=${`${formatCurrency(totalMrr * 12)} ARR`} />
+        <${KeyValue}
+          label="MRR"
+          value=${formatCurrencyCompact(totalMrr)}
+          hint=${`${formatCurrency(totalMrr * 12)} ARR${trials ? `, ${trials} trial${trials === 1 ? "" : "s"} excluded` : ""}`}
+        />
         <${KeyValue} label="MRR at risk" value=${formatCurrencyCompact(atRiskMrr)} hint=${`${atRisk.length} past due or churn risk`}>
           ${atRisk.length > 0 ? html`<${StatusIndicator} tone="warning" label="Needs attention" />` : null}
         <//>
@@ -202,7 +208,7 @@ function CustomerRow({ customer, selected, starred }) {
       <td>
         ${customer.status === "trial"
           ? html`<span class="muted">-</span>`
-          : html`<${TrendSparkline} class="table-spark" values=${getCustomerTrend(customer)} width=${88} height=${24} />`}
+          : html`<${TrendSparkline} class="table-spark" values=${getAccountHistory(customer)} width=${88} height=${24} />`}
       </td>
       <td class="cell-progress"><${ProgressBar} value=${customer.health} tone=${healthTone(customer.health)} label="Health score" unit="" /></td>
       <td><${StatusIndicator} tone=${status.tone} label=${status.label} /></td>

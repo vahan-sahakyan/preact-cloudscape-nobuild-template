@@ -10,7 +10,7 @@ import { theme, themeCycle, cycleTheme, darkMode, navCollapsed, liveUpdates } fr
 import { selectedRegion } from "../state/dashboard-signals.js";
 import { now } from "../state/activity-signals.js";
 import { mobileNavOpen, paletteOpen, breadcrumbs, helpTopic, pageTopic } from "../state/ui-signals.js";
-import { regions } from "../data/metrics.js";
+import { regionNames } from "../state/accounts-signals.js";
 import { navigate } from "../router/router.js";
 import { modKey } from "../hooks/use-hotkeys.js";
 
@@ -25,7 +25,7 @@ function RegionSelector() {
   const items = [
     { id: "all", text: "All regions", checked: !region },
     { id: "divider", divider: true },
-    ...regions.map((item) => ({ id: item.name, text: item.name, checked: region === item.name }))
+    ...regionNames.value.map((name) => ({ id: name, text: name, checked: region === name }))
   ];
 
   return html`

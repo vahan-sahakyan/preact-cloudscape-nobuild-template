@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 import { mulberry32, seedFromString } from "../lib/random.js";
 import { DAY, parseDate } from "../lib/format.js";
+import { seed } from "./api.js";
 
 export const planOrder = ["Starter", "Growth", "Scale", "Enterprise"];
 
@@ -19,32 +20,33 @@ export function isAtRisk(customer) {
   return customer.status === "past_due" || customer.status === "churn_risk";
 }
 
-// deterministic MRR history per customer, always ending at their current MRR
-export function getCustomerTrend(customer, points = 12) {
-  const random = mulberry32(seedFromString(customer.id));
-  const declining = isAtRisk(customer);
-  const trend = [];
-  let value = customer.mrr * (declining ? 1.25 : 0.6);
+const seedById = new Map(seed.accounts.map((account) => [account.id, account]));
 
-  for (let i = 0; i < points; i++) {
-    if (i === points - 1) {
-      value = customer.mrr;
-    } else {
-      value *= declining ? 1 + (random() - 0.65) * 0.14 : 1 + (random() - 0.3) * 0.18;
-    }
+// monthly MRR, oldest first. Past months are generated backwards from the account's json MRR, so they
+// stay fixed; the current month is the live MRR. Trials and months before signup count as zero
+export function getAccountHistory(account, points = 12) {
+  const base = seedById.get(account.id) || account;
+  const random = mulberry32(seedFromString(account.id));
+  const currentMonth = d3.timeMonth.floor(new Date());
+  const signupMonth = d3.timeMonth.floor(parseDate(base.since));
+  const drift = isAtRisk(base) ? -0.03 : 0.035;
+  const values = new Array(points);
+  let value = base.mrr;
 
-    trend.push(Math.max(Math.round(value), 10));
+  // walking from the present backwards keeps recent months identical whatever the length
+  for (let i = points - 2; i >= 0; i--) {
+    value /= 1 + drift + (random() - 0.5) * 0.08;
+    const month = d3.timeMonth.offset(currentMonth, i - points + 1);
+    values[i] = base.status === "trial" || month < signupMonth ? 0 : Math.round(value);
   }
 
-  return trend;
+  values[points - 1] = account.status === "trial" ? 0 : account.mrr;
+  return values;
 }
 
-export function getCustomerSeries(customer, points = 12) {
+export function getAccountSeries(account, points = 12) {
   const currentMonth = d3.timeMonth.floor(new Date());
-  return getCustomerTrend(customer, points).map((value, i) => ({
-    date: d3.timeMonth.offset(currentMonth, i - points + 1),
-    value
-  }));
+  return getAccountHistory(account, points).map((value, i) => ({ date: d3.timeMonth.offset(currentMonth, i - points + 1), value }));
 }
 
 export function getRenewalDate(customer, now = new Date()) {

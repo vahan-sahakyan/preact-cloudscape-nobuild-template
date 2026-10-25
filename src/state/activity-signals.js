@@ -4,7 +4,8 @@ import { persistedSignal } from "../lib/storage.js";
 import { liveUpdates } from "./settings-signals.js";
 import { accounts, updateAccount, seedEvents, SEED_VERSION } from "./accounts-signals.js";
 
-const MAX_EVENTS = 40;
+// enough history to cover the 30-day MRR movement window
+const MAX_EVENTS = 200;
 const LOCK_NAME = "pulse:live-activity";
 
 export const events = persistedSignal(`events.${SEED_VERSION}`, seedEvents);

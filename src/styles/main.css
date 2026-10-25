@@ -780,6 +780,10 @@ h2.heading-title {
   text-decoration: underline;
 }
 
+.section-header {
+  padding-top: 8px;
+}
+
 .page-description {
   margin-top: 4px;
   color: var(--color-text-secondary);
@@ -859,11 +863,11 @@ h2.heading-title {
   gap: var(--gap);
 }
 
-/* Cloudscape ColumnLayout borders="vertical" */
+/* Cloudscape ColumnLayout borders="vertical"; --columns is set from the item count */
 .column-layout,
 .metric-columns {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--columns, 4), minmax(0, 1fr));
 }
 
 .column-layout > *,
@@ -2702,20 +2706,14 @@ body.awsui-dark-mode .toggle-switch.is-on .toggle-knob {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .column-layout,
-  .metric-columns {
+  .column-layout {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     row-gap: 20px;
   }
 
-  .column-layout > :nth-child(odd),
-  .metric-columns > :nth-child(odd) {
+  .column-layout > :nth-child(odd) {
     padding-left: 0;
     border-left: 0;
-  }
-
-  .metric-column:nth-child(odd)[aria-pressed="true"]::after {
-    left: 0;
   }
 }
 

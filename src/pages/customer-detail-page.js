@@ -4,7 +4,7 @@ import { PageHeader, Panel } from "../components/layout.js";
 import { Icon } from "../components/icons.js";
 import { EmptyState, KeyValue, ProgressBar, StatusIndicator } from "../components/ui.js";
 import { MetricLineChart } from "../components/charts/metric-line.js";
-import { statusTone, healthTone, getCustomerSeries, getCustomerTimeline, getRenewalDate } from "../data/customers.js";
+import { statusTone, healthTone, getAccountSeries, getCustomerTimeline, getRenewalDate } from "../data/customers.js";
 import { accounts, findAccount } from "../state/accounts-signals.js";
 import { events, now } from "../state/activity-signals.js";
 import { sortedCustomers, starredIds, notesById, toggleStar, addNote, removeNote } from "../state/customers-signals.js";
@@ -128,7 +128,7 @@ export function CustomerDetailPage({ id }) {
 
   const status = statusTone[customer.status];
   const starred = starredIds.value.includes(customer.id);
-  const series = getCustomerSeries(customer);
+  const series = getAccountSeries(customer);
   const change = ((series[series.length - 1].value - series[0].value) / series[0].value) * 100;
   const renewal = getRenewalDate(customer);
   const timeline = getTimeline(customer);

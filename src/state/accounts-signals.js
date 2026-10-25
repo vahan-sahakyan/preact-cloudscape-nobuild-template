@@ -26,6 +26,7 @@ export const accounts = persistedSignal(`accounts.${SEED_VERSION}`, seed.account
 export const accountsById = computed(() => new Map(accounts.value.map((account) => [account.id, account])));
 export const owners = computed(() => [...new Set(accounts.value.map((account) => account.owner))].sort());
 export const atRiskCount = computed(() => accounts.value.filter(isAtRisk).length);
+export const regionNames = computed(() => [...new Set(accounts.value.map((account) => account.region))]);
 
 export function findAccount(id) {
   return accountsById.value.get(id);

@@ -90,6 +90,8 @@ export const monthsBack = persistedSignal("range", 12); // mirrored to localStor
 export const filtered = computed(() => rows.filter((row) => row.name.includes(searchTerm.value)));
 ```
 
+Revenue metrics are derived, never stored: [src/state/metrics-signals.js](src/state/metrics-signals.js) computes MRR, paying accounts, MRR per account, region shares, MRR by plan and the 30-day MRR movement from the accounts and their events, scoped by the region selector. Product analytics (active users, conversion, retention, funnel, cohorts) describe a user base the account records do not model, so they come from their own JSON.
+
 Live activity changes the records it describes. An upgrade moves the account up a plan and raises MRR, added seats raise the seat count, and a failed payment marks the account past due. The table, account page, timeline and charts update with it. Accounts and events are persisted and synced, and exactly one tab generates events: it holds a [Web Lock](https://developer.mozilla.org/docs/Web/API/Web_Locks_API) until it closes, then the next tab takes over ([src/state/activity-signals.js](src/state/activity-signals.js)).
 
 Persisted state stays reactive across tabs. `persistedSignal` ([src/lib/storage.js](src/lib/storage.js)) listens for the browser's `storage` event, so a change in one tab updates every other open tab without a reload. Per-tab layout state, such as whether the navigation is open, uses `sessionSignal` (`sessionStorage`) and is not shared.
