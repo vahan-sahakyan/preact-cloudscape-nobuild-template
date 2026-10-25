@@ -1,6 +1,6 @@
 import { signal, computed, effect } from "@preact/signals";
 import { applyMode, applyDensity, disableMotion, Mode, Density } from "@cloudscape-design/global-styles";
-import { persistedSignal } from "../lib/storage.js";
+import { persistedSignal, sessionSignal } from "../lib/storage.js";
 
 const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -9,7 +9,8 @@ const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 export const theme = persistedSignal("theme", "system");
 export const compactDensity = persistedSignal("compact", false);
 export const reduceMotion = persistedSignal("reduceMotion", motionQuery.matches);
-export const navCollapsed = persistedSignal("navCollapsed", false);
+// per tab: each tab keeps its own layout
+export const navCollapsed = sessionSignal("navCollapsed", false);
 export const liveUpdates = persistedSignal("liveUpdates", true);
 
 const systemDark = signal(darkQuery.matches);

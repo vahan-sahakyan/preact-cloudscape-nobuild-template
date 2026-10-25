@@ -79,6 +79,8 @@ export const monthsBack = persistedSignal("range", 12); // mirrored to localStor
 export const filtered = computed(() => rows.filter((row) => row.name.includes(searchTerm.value)));
 ```
 
+Persisted state stays reactive across tabs. `persistedSignal` ([src/lib/storage.js](src/lib/storage.js)) listens for the browser's `storage` event, so a change in one tab updates every other open tab without a reload. Per-tab layout state, such as whether the navigation is open, uses `sessionSignal` (`sessionStorage`) and is not shared.
+
 ### Cloudscape tokens
 
 The tokens package exports CSS `var()` references with light-mode fallbacks, for example `var(--color-text-accent-xcihqq, #006ce0)`. [src/lib/cloudscape-tokens.js](src/lib/cloudscape-tokens.js) maps them onto the app's own custom properties:

@@ -125,7 +125,7 @@ export function SettingsPage() {
         />
         <${ToggleSwitch}
           label="Hide navigation"
-          description="Hide the navigation panel on wide screens, the menu button reopens it"
+          description="Applies to this tab only; the menu button reopens it"
           checked=${navCollapsed.value}
           onChange=${(value) => {
             navCollapsed.value = value;
