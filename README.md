@@ -121,8 +121,8 @@ ES modules need an HTTP server; `file://` does not work.
 
 ```sh
 npx serve .
-# or
-python3 -m http.server 8000
+# or, Python 3.11+ (the default HTTP/1.0 mode drops parallel module requests)
+python3 -m http.server 8000 --protocol HTTP/1.1
 ```
 
 ## Project structure
