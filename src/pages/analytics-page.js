@@ -12,7 +12,8 @@ import { BarListChart } from "../components/charts/bar-list.js";
 import { funnelSegments, getFunnel } from "../data/funnel.js";
 import { retentionCohorts } from "../data/retention.js";
 import { getMrrMovement } from "../data/metrics.js";
-import { customers, planOrder } from "../data/customers.js";
+import { planOrder } from "../data/customers.js";
+import { accounts } from "../state/accounts-signals.js";
 import { formatCurrencyCompact, formatPercent, formatSignedCurrency } from "../lib/format.js";
 import { usePage } from "../hooks/use-page.js";
 
@@ -24,9 +25,11 @@ const movement = getMrrMovement();
 const netChange = d3.sum(movement.items, (item) => item.value);
 const avgM1 = d3.mean(retentionCohorts.cohorts, (cohort) => cohort.values[1] ?? undefined);
 
-const planRevenue = planOrder
-  .map((plan) => ({ name: plan, value: d3.sum(customers.filter((customer) => customer.plan === plan), (customer) => customer.mrr) }))
-  .sort((a, b) => b.value - a.value);
+const planRevenue = computed(() =>
+  planOrder
+    .map((plan) => ({ name: plan, value: d3.sum(accounts.value.filter((customer) => customer.plan === plan), (customer) => customer.mrr) }))
+    .sort((a, b) => b.value - a.value)
+);
 
 const heatModes = [
   { id: "percent", label: "%" },
@@ -122,8 +125,8 @@ export function AnalyticsPage() {
         <${MrrWaterfallChart} items=${movement.items} />
       <//>
 
-      <${Panel} title="Key account MRR by plan" description=${`${customers.length} named accounts, ${formatCurrencyCompact(d3.sum(planRevenue, (d) => d.value))} combined`}>
-        <${BarListChart} items=${planRevenue} format="currency" label="Key account MRR by plan" />
+      <${Panel} title="Key account MRR by plan" description=${`${accounts.value.length} named accounts, ${formatCurrencyCompact(d3.sum(planRevenue.value, (d) => d.value))} combined`}>
+        <${BarListChart} items=${planRevenue.value} format="currency" label="Key account MRR by plan" />
       <//>
     </div>
   `;

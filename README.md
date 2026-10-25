@@ -66,6 +66,17 @@ export function Panel({ title, children }) {
 // components: <${Panel} title="Accounts">...<//>
 ```
 
+### Data
+
+Fixed records live in JSON under [src/data/](src/data/) (`accounts.json`, `metrics.json`, `funnel.json`, ...). [src/data/api.js](src/data/api.js) fetches them once at startup, like an API response, and uses top-level await so every module importing `seed` runs after the data arrives:
+
+```js
+const results = await Promise.all(files.map((name) => fetch(new URL(`./${name}.json`, import.meta.url)).then((r) => r.json())));
+export const seed = Object.fromEntries(files.map((name, i) => [name, results[i]]));
+```
+
+`index.js` imports the app dynamically, so the boot message shows while data loads, and an error is shown if it fails. Pointing these URLs at real endpoints is the only change a backend needs. Values that depend on the current date (metric series, cohort labels) are generated in JS from parameters in the JSON.
+
 ### Signals for state
 
 State lives in plain modules under `src/state/`. A component that reads `.value` re-renders when it changes; no providers or reducers.
@@ -78,6 +89,8 @@ export const searchTerm = signal("");
 export const monthsBack = persistedSignal("range", 12); // mirrored to localStorage
 export const filtered = computed(() => rows.filter((row) => row.name.includes(searchTerm.value)));
 ```
+
+Live activity changes the records it describes. An upgrade moves the account up a plan and raises MRR, added seats raise the seat count, and a failed payment marks the account past due. The table, account page, timeline and charts update with it. Accounts and events are persisted and synced, and exactly one tab generates events: it holds a [Web Lock](https://developer.mozilla.org/docs/Web/API/Web_Locks_API) until it closes, then the next tab takes over ([src/state/activity-signals.js](src/state/activity-signals.js)).
 
 Persisted state stays reactive across tabs. `persistedSignal` ([src/lib/storage.js](src/lib/storage.js)) listens for the browser's `storage` event, so a change in one tab updates every other open tab without a reload. Per-tab layout state, such as whether the navigation is open, uses `sessionSignal` (`sessionStorage`) and is not shared.
 
@@ -140,7 +153,7 @@ src/
     charts/           D3 render functions and their components
   state/              signals: settings, UI, filters, live data
   hooks/              useChart, usePage, useHotkeys
-  data/               generated sample data and help text
+  data/               *.json records, api.js loader, generators for series and events
   lib/                tokens bridge, storage, formatting, CSV
   styles/main.css     tokens, light/dark themes, components
 docs/                 screenshots
@@ -152,6 +165,7 @@ docs/                 screenshots
 - **Chart:** write `renderX(container, data, { animate })` in `src/components/charts/`, wrap it with `useChart`, and style it through CSS classes that use the `--chart-*` variables.
 - **State:** export a `signal`, `computed` or `persistedSignal` from a module in `src/state/`.
 - **Component:** follow the existing Cloudscape-style pieces in `src/components/` (`Panel`, `PageHeader`, `ButtonDropdown`, `Tabs`, `StatusIndicator`, `ProgressBar`).
+- **Data:** add a JSON file in `src/data/`, list it in `files` in [src/data/api.js](src/data/api.js), and read it from `seed`.
 - **Dependency:** add an entry to the import map and import it by name.
 
 ## Included UI
@@ -172,7 +186,8 @@ Settings > Pages > Build and deployment > Deploy from a branch > `main`, `/ (roo
 - Needs network access to esm.sh, jsdelivr and unpkg at runtime. To run offline, download the modules and point the import map at local copies.
 - No type checking, linting or tests.
 - Cloudscape is approximated with tokens and CSS, not the official components. Dark-mode values are maintained by hand.
-- Sample data is generated in the browser from seeded random values.
+- Sample records come from the JSON files; metric series, history and live events are generated in the browser from seeded random values.
+- Live changes to accounts are saved in `localStorage`; Settings > Reset local data restores the JSON records.
 
 ## License
 

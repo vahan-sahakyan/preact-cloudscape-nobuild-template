@@ -6,14 +6,12 @@ import { currentPath } from "../router/router.js";
 import { navCollapsed } from "../state/settings-signals.js";
 import { mobileNavOpen } from "../state/ui-signals.js";
 import { starredIds } from "../state/customers-signals.js";
-import { customers, isAtRisk } from "../data/customers.js";
-
-const atRiskCount = customers.filter(isAtRisk).length;
+import { accounts, atRiskCount } from "../state/accounts-signals.js";
 
 const mainLinks = [
   { path: "/", label: "Overview" },
   { path: "/analytics", label: "Analytics" },
-  { path: "/customers", label: "Customers", badge: atRiskCount, badgeLabel: `${atRiskCount} accounts at risk` }
+  { path: "/customers", label: "Customers", atRisk: true }
 ];
 
 function isActive(linkPath, path) {
@@ -34,7 +32,8 @@ function NavLink({ href, label, active, children }) {
 export function SideNav() {
   const path = currentPath.value;
   const [starredOpen, setStarredOpen] = useState(true);
-  const starred = customers.filter((customer) => starredIds.value.includes(customer.id));
+  const starred = accounts.value.filter((customer) => starredIds.value.includes(customer.id));
+  const atRisk = atRiskCount.value;
 
   return html`
     <nav id="side-nav" class="side-nav" aria-label="Pulse Ops navigation">
@@ -59,7 +58,7 @@ export function SideNav() {
         ${mainLinks.map(
           (link) => html`
             <${NavLink} key=${link.path} href=${link.path} label=${link.label} active=${isActive(link.path, path)}>
-              ${link.badge ? html`<span title=${link.badgeLabel}><${Badge} tone="red">${link.badge}<//></span>` : null}
+              ${link.atRisk && atRisk > 0 ? html`<span title=${`${atRisk} accounts at risk`}><${Badge} tone="red">${atRisk}<//></span>` : null}
             <//>
           `
         )}

@@ -6,11 +6,14 @@ import { events, now } from "../state/activity-signals.js";
 import { liveUpdates } from "../state/settings-signals.js";
 import { formatSignedCurrency, formatTimeAgo } from "../lib/format.js";
 
+// events from before this tab loaded render still; newer ones, from this or another tab, slide in
+const pageLoadedAt = Date.now();
+
 const toneIcon = { success: "statusPositive", info: "statusInfo", warning: "statusWarning", error: "statusNegative", pending: "statusPending" };
 
 function FeedItem({ event, clock }) {
   return html`
-    <li class=${`feed-item ${event.isLive ? "is-new" : ""}`}>
+    <li class=${`feed-item ${event.at > pageLoadedAt ? "is-new" : ""}`}>
       <span class=${`feed-icon tone-${event.tone}`}><${Icon} name=${toneIcon[event.tone]} /></span>
       <div class="feed-body">
         <p class="feed-text">

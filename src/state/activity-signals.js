@@ -1,10 +1,13 @@
-import { signal, effect } from "@preact/signals";
+import { signal, effect, batch } from "@preact/signals";
 import { createSeedEvents, createLiveEvent } from "../data/activity.js";
+import { persistedSignal } from "../lib/storage.js";
 import { liveUpdates } from "./settings-signals.js";
+import { accounts, updateAccount, SEED_VERSION } from "./accounts-signals.js";
 
 const MAX_EVENTS = 40;
+const LOCK_NAME = "pulse:live-activity";
 
-export const events = signal(createSeedEvents());
+export const events = persistedSignal(`events.${SEED_VERSION}`, createSeedEvents(accounts.value));
 
 // coarse clock so "5m ago" labels stay fresh without re-rendering every second
 export const now = signal(Date.now());
@@ -13,19 +16,40 @@ setInterval(() => {
   now.value = Date.now();
 }, 30_000);
 
-effect(() => {
-  if (!liveUpdates.value) {
+// true in the single tab that currently generates events
+export const isGenerator = signal(false);
+
+function tick() {
+  if (Math.random() < 0.4) {
     return;
   }
 
-  const timer = setInterval(() => {
-    if (document.hidden || Math.random() < 0.4) {
+  const { event, patch } = createLiveEvent(accounts.value);
+
+  batch(() => {
+    updateAccount(event.customerId, patch);
+    events.value = [event, ...events.value].slice(0, MAX_EVENTS);
+    now.value = Date.now();
+  });
+}
+
+function generate() {
+  isGenerator.value = true;
+
+  effect(() => {
+    if (!liveUpdates.value) {
       return;
     }
 
-    events.value = [createLiveEvent(), ...events.value].slice(0, MAX_EVENTS);
-    now.value = Date.now();
-  }, 4500);
+    const timer = setInterval(tick, 4500);
+    return () => clearInterval(timer);
+  });
+}
 
-  return () => clearInterval(timer);
-});
+// one tab generates and the rest receive its changes through storage sync, so tabs never
+// produce conflicting events; the lock is held until the tab closes, then the next tab takes over
+if (navigator.locks) {
+  navigator.locks.request(LOCK_NAME, () => new Promise(() => generate()));
+} else {
+  generate();
+}

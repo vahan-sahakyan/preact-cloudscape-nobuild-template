@@ -1,0 +1,96 @@
+{
+  "kpis": [
+    {
+      "id": "revenue",
+      "label": "MRR",
+      "format": "currency",
+      "target": 200000,
+      "series": {
+        "seed": 11,
+        "end": 184200,
+        "drift": 0.02,
+        "noise": 0.024,
+        "relative": true
+      }
+    },
+    {
+      "id": "activeUsers",
+      "label": "Active users",
+      "format": "number",
+      "target": 100000,
+      "series": {
+        "seed": 23,
+        "end": 92640,
+        "drift": 0.015,
+        "noise": 0.03,
+        "relative": true
+      }
+    },
+    {
+      "id": "conversion",
+      "label": "Trial conversion",
+      "format": "percent",
+      "target": 5.5,
+      "series": {
+        "seed": 37,
+        "end": 4.83,
+        "drift": -0.025,
+        "noise": 0.16,
+        "relative": false
+      }
+    },
+    {
+      "id": "retention",
+      "label": "D30 retention",
+      "format": "percent",
+      "target": 65,
+      "series": {
+        "seed": 41,
+        "end": 62.1,
+        "drift": 0.2,
+        "noise": 0.7,
+        "relative": false
+      }
+    }
+  ],
+  "channels": [
+    {
+      "name": "Organic",
+      "value": 42.2
+    },
+    {
+      "name": "Paid",
+      "value": 24.7
+    },
+    {
+      "name": "Referral",
+      "value": 18.5
+    },
+    {
+      "name": "Partnerships",
+      "value": 9.8
+    },
+    {
+      "name": "Outbound",
+      "value": 4.8
+    }
+  ],
+  "regions": [
+    {
+      "name": "North America",
+      "value": 41
+    },
+    {
+      "name": "Europe",
+      "value": 29
+    },
+    {
+      "name": "APAC",
+      "value": 19
+    },
+    {
+      "name": "LATAM",
+      "value": 11
+    }
+  ]
+}

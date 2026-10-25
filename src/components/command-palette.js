@@ -6,7 +6,7 @@ import { navigate } from "../router/router.js";
 import { paletteOpen } from "../state/ui-signals.js";
 import { theme, themeCycle, cycleTheme, liveUpdates, navCollapsed } from "../state/settings-signals.js";
 import { starredIds, exportCustomers } from "../state/customers-signals.js";
-import { customers } from "../data/customers.js";
+import { accounts } from "../state/accounts-signals.js";
 import { modKey } from "../hooks/use-hotkeys.js";
 
 const pages = [
@@ -35,17 +35,17 @@ function getActions() {
       keys: ["["],
       run: () => (navCollapsed.value = !collapsed)
     },
-    { id: "action-export", label: "Export all accounts as CSV", icon: "download", run: () => exportCustomers(customers) }
+    { id: "action-export", label: "Export all accounts as CSV", icon: "download", run: () => exportCustomers(accounts.value) }
   ].map((action) => ({ ...action, group: "Actions" }));
 }
 
 function getAccounts(query) {
   if (!query) {
     const starred = new Set(starredIds.value);
-    return customers.filter((customer) => starred.has(customer.id)).slice(0, 5).map((customer) => toAccountItem(customer, "Starred accounts"));
+    return accounts.value.filter((customer) => starred.has(customer.id)).slice(0, 5).map((customer) => toAccountItem(customer, "Starred accounts"));
   }
 
-  return customers
+  return accounts.value
     .filter((customer) => `${customer.name} ${customer.id} ${customer.owner}`.toLowerCase().includes(query))
     .slice(0, 6)
     .map((customer) => toAccountItem(customer, "Accounts"));

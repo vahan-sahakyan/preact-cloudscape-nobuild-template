@@ -4,17 +4,33 @@ import { PageHeader, Panel } from "../components/layout.js";
 import { Icon } from "../components/icons.js";
 import { EmptyState, KeyValue, ProgressBar, StatusIndicator } from "../components/ui.js";
 import { MetricLineChart } from "../components/charts/metric-line.js";
-import { customers, findCustomer, statusTone, healthTone, getCustomerSeries, getCustomerTimeline, getRenewalDate } from "../data/customers.js";
+import { statusTone, healthTone, getCustomerSeries, getCustomerTimeline, getRenewalDate } from "../data/customers.js";
+import { accounts, findAccount } from "../state/accounts-signals.js";
+import { events, now } from "../state/activity-signals.js";
 import { sortedCustomers, starredIds, notesById, toggleStar, addNote, removeNote } from "../state/customers-signals.js";
 import { showToast } from "../state/ui-signals.js";
-import { formatCurrency, formatCurrencyCompact, formatDate, formatDaysAgo, formatDelta, formatTimeAgo, formatTimeUntil } from "../lib/format.js";
+import { formatCurrency, formatCurrencyCompact, formatDate, formatDaysAgo, formatDelta, formatSignedCurrency, formatTimeAgo, formatTimeUntil } from "../lib/format.js";
 import { usePage } from "../hooks/use-page.js";
 
 // prev/next follow the table's current sort and filters when the account is in it
 function getNeighbours(id) {
-  const list = sortedCustomers.value.some((customer) => customer.id === id) ? sortedCustomers.value : customers;
+  const list = sortedCustomers.value.some((customer) => customer.id === id) ? sortedCustomers.value : accounts.value;
   const index = list.findIndex((customer) => customer.id === id);
   return { prev: list[index - 1], next: list[index + 1], position: index + 1, total: list.length };
+}
+
+// generated milestones plus this account's entries from the shared activity feed
+function getTimeline(customer) {
+  const activity = events.value
+    .filter((event) => event.customerId === customer.id)
+    .map((event) => ({
+      at: new Date(event.at),
+      title: event.text[0].toUpperCase() + event.text.slice(1),
+      detail: event.amount ? `${formatSignedCurrency(event.amount)} MRR` : `Activity in ${event.region}`,
+      tone: event.tone
+    }));
+
+  return [...activity, ...getCustomerTimeline(customer)].sort((a, b) => b.at - a.at);
 }
 
 function copyId(id) {
@@ -92,7 +108,7 @@ function NotesPanel({ customerId }) {
 }
 
 export function CustomerDetailPage({ id }) {
-  const customer = findCustomer(id);
+  const customer = findAccount(id);
   usePage({
     title: customer ? customer.name : "Account not found",
     topic: "account",
@@ -115,7 +131,8 @@ export function CustomerDetailPage({ id }) {
   const series = getCustomerSeries(customer);
   const change = ((series[series.length - 1].value - series[0].value) / series[0].value) * 100;
   const renewal = getRenewalDate(customer);
-  const timeline = getCustomerTimeline(customer);
+  const timeline = getTimeline(customer);
+  const clock = now.value;
   const { prev, next, position, total } = getNeighbours(customer.id);
 
   return html`
@@ -194,7 +211,7 @@ export function CustomerDetailPage({ id }) {
                 <div>
                   <p class="timeline-title">${entry.title}</p>
                   <p class="timeline-detail">${entry.detail}</p>
-                  <p class="timeline-date">${formatDate(entry.at)}</p>
+                  <p class="timeline-date">${formatTimeAgo(entry.at, clock)}</p>
                 </div>
               </li>
             `

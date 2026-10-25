@@ -1,13 +1,13 @@
 import { html } from "htm/preact";
 import { Icon } from "./icons.js";
 import { Keys } from "./ui.js";
-import { helpTopics } from "../data/help.js";
+import { seed } from "../data/api.js";
 import { helpTopic } from "../state/ui-signals.js";
 import { modKey } from "../hooks/use-hotkeys.js";
 
 // Cloudscape HelpPanel in the tools drawer
 export function HelpPanel() {
-  const topic = helpTopics[helpTopic.value];
+  const topic = seed.help[helpTopic.value];
 
   if (!topic) {
     return null;

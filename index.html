@@ -48,6 +48,12 @@
     </script>
 
     <div id="app"><div class="boot" role="status">Loading console...</div></div>
+    <script>
+      // module scripts and fetch are blocked on file://, say so instead of loading forever
+      if (location.protocol === "file:") {
+        document.querySelector(".boot").textContent = "Serve this folder over http (see README), file:// cannot load ES modules.";
+      }
+    </script>
     <noscript>Pulse Ops needs JavaScript to run.</noscript>
 
     <!-- main module entry point -->

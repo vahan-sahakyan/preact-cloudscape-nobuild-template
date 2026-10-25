@@ -10,8 +10,9 @@ import { MetricLineChart } from "../components/charts/metric-line.js";
 import { BarListChart } from "../components/charts/bar-list.js";
 import { RegionDonutChart } from "../components/charts/region-donut.js";
 import { channels, regions, rangeOptions } from "../data/metrics.js";
-import { customers, healthTone } from "../data/customers.js";
-import { initiatives } from "../data/initiatives.js";
+import { healthTone } from "../data/customers.js";
+import { seed } from "../data/api.js";
+import { accounts } from "../state/accounts-signals.js";
 import {
   monthsBack,
   compareEnabled,
@@ -111,7 +112,7 @@ function RegionPanel() {
 
 function TopAccountsPanel() {
   const region = selectedRegion.value;
-  const rows = customers
+  const rows = accounts.value
     .filter((customer) => !region || customer.region === region)
     .sort((a, b) => b.mrr - a.mrr)
     .slice(0, 5);
@@ -144,6 +145,8 @@ function TopAccountsPanel() {
 }
 
 function InitiativesPanel() {
+  const { initiatives } = seed;
+
   return html`
     <${Panel} title="Now tracking" counter=${initiatives.length} description="Growth initiatives in motion">
       <div class="table-wrap">

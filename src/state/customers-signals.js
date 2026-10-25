@@ -1,9 +1,10 @@
 import { signal, computed } from "@preact/signals";
-import { customers, statusTone, planOrder } from "../data/customers.js";
+import { statusTone, planOrder } from "../data/customers.js";
 import { persistedSignal } from "../lib/storage.js";
 import { downloadCsv } from "../lib/csv.js";
 import { showToast } from "./ui-signals.js";
 import { selectedRegion } from "./dashboard-signals.js";
+import { accounts } from "./accounts-signals.js";
 
 export const PAGE_SIZE = 10;
 
@@ -48,7 +49,7 @@ export const filteredCustomers = computed(() => {
   const starred = starredOnly.value ? new Set(starredIds.value) : null;
   const region = selectedRegion.value;
 
-  return customers.filter((customer) => {
+  return accounts.value.filter((customer) => {
     if (region && customer.region !== region) {
       return false;
     }

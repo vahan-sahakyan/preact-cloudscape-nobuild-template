@@ -5,7 +5,8 @@ import { EmptyState, KeyValue, ProgressBar, StatusIndicator } from "../component
 import { ButtonDropdown } from "../components/button-dropdown.js";
 import { Toggle } from "../components/toggle-switch.js";
 import { TrendSparkline } from "../components/trend-sparkline.js";
-import { customers, statusTone, planOrder, owners, healthTone, isAtRisk, getCustomerTrend } from "../data/customers.js";
+import { statusTone, planOrder, healthTone, isAtRisk, getCustomerTrend } from "../data/customers.js";
+import { accounts, owners } from "../state/accounts-signals.js";
 import {
   PAGE_SIZE,
   searchTerm,
@@ -48,8 +49,6 @@ const columns = [
   { key: "lastActive", label: "Last active" }
 ];
 
-// sparklines are deterministic per account, compute once
-const trends = new Map(customers.map((customer) => [customer.id, getCustomerTrend(customer)]));
 
 function Summary({ rows }) {
   const totalMrr = rows.reduce((sum, customer) => sum + customer.mrr, 0);
@@ -60,7 +59,7 @@ function Summary({ rows }) {
   return html`
     <${Panel} title="Summary" description="Totals for the accounts matching the current filters">
       <div class="column-layout">
-        <${KeyValue} label="Accounts" value=${rows.length} hint=${`of ${customers.length} total`} />
+        <${KeyValue} label="Accounts" value=${rows.length} hint=${`of ${accounts.value.length} total`} />
         <${KeyValue} label="Total MRR" value=${formatCurrencyCompact(totalMrr)} hint=${`${formatCurrency(totalMrr * 12)} ARR`} />
         <${KeyValue} label="MRR at risk" value=${formatCurrencyCompact(atRiskMrr)} hint=${`${atRisk.length} past due or churn risk`}>
           ${atRisk.length > 0 ? html`<${StatusIndicator} tone="warning" label="Needs attention" />` : null}
@@ -121,7 +120,7 @@ function Filters({ matches }) {
       <${Select}
         label="Owner"
         value=${ownerFilter.value}
-        options=${[{ value: "all", label: "Any owner" }, ...owners.map((owner) => ({ value: owner, label: owner }))]}
+        options=${[{ value: "all", label: "Any owner" }, ...owners.value.map((owner) => ({ value: owner, label: owner }))]}
         onChange=${(value) => updateFilter(ownerFilter, value)}
       />
       <${Toggle} label="Starred only" checked=${starredOnly.value} onChange=${(value) => updateFilter(starredOnly, value)} />
@@ -202,7 +201,7 @@ function CustomerRow({ customer, selected, starred }) {
       <td>
         ${customer.status === "trial"
           ? html`<span class="muted">-</span>`
-          : html`<${TrendSparkline} class="table-spark" values=${trends.get(customer.id)} width=${88} height=${24} />`}
+          : html`<${TrendSparkline} class="table-spark" values=${getCustomerTrend(customer)} width=${88} height=${24} />`}
       </td>
       <td class="cell-progress"><${ProgressBar} value=${customer.health} tone=${healthTone(customer.health)} label="Health score" unit="" /></td>
       <td><${StatusIndicator} tone=${status.tone} label=${status.label} /></td>
