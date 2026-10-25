@@ -13,7 +13,7 @@ export const statusFilter = signal([]);
 export const planFilter = signal("all");
 export const ownerFilter = signal("all");
 export const starredOnly = signal(false);
-export const sortState = signal({ key: "mrr", direction: "desc" });
+export const sortState = signal({ key: "updatedAt", direction: "desc" });
 export const page = signal(1);
 export const selectedIds = signal([]);
 
@@ -28,7 +28,7 @@ const sortValue = {
   health: (customer) => customer.health,
   status: (customer) => statusTone[customer.status].rank,
   owner: (customer) => customer.owner,
-  lastActive: (customer) => customer.lastActive
+  updatedAt: (customer) => customer.updatedAt
 };
 
 const textColumns = new Set(["name", "owner"]);
@@ -170,7 +170,8 @@ const csvColumns = [
   { label: "Health", value: (customer) => customer.health },
   { label: "Status", value: (customer) => statusTone[customer.status].label },
   { label: "Owner", value: (customer) => customer.owner },
-  { label: "Customer since", value: (customer) => customer.since }
+  { label: "Customer since", value: (customer) => customer.since },
+  { label: "Updated at", value: (customer) => new Date(customer.updatedAt).toISOString() }
 ];
 
 export function exportCustomers(rows) {

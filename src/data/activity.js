@@ -183,8 +183,10 @@ export function createLiveEvent(accounts, random = Math.random) {
   const details = template.apply(account, random);
   const id = `E-${Date.now().toString(36)}-${Math.floor(random() * 1e6).toString(36)}`;
 
+  const at = Date.now();
+
   return {
-    event: toEvent(template, account, details, Date.now(), id),
-    patch: { ...details.patch, lastActive: 0 }
+    event: toEvent(template, account, details, at, id),
+    patch: { ...details.patch, lastActive: 0, updatedAt: at }
   };
 }

@@ -34,7 +34,8 @@ import {
 } from "../state/customers-signals.js";
 import { selectedRegion } from "../state/dashboard-signals.js";
 import { navigate } from "../router/router.js";
-import { formatCurrency, formatCurrencyCompact, formatDaysAgo } from "../lib/format.js";
+import { formatCurrency, formatCurrencyCompact, formatTimeAgo } from "../lib/format.js";
+import { now } from "../state/activity-signals.js";
 import { usePage } from "../hooks/use-page.js";
 
 const columns = [
@@ -46,7 +47,7 @@ const columns = [
   { key: "health", label: "Health" },
   { key: "status", label: "Status" },
   { key: "owner", label: "Owner" },
-  { key: "lastActive", label: "Last active" }
+  { key: "updatedAt", label: "Updated" }
 ];
 
 
@@ -206,7 +207,7 @@ function CustomerRow({ customer, selected, starred }) {
       <td class="cell-progress"><${ProgressBar} value=${customer.health} tone=${healthTone(customer.health)} label="Health score" unit="" /></td>
       <td><${StatusIndicator} tone=${status.tone} label=${status.label} /></td>
       <td>${customer.owner}</td>
-      <td>${formatDaysAgo(customer.lastActive)}</td>
+      <td title=${new Date(customer.updatedAt).toLocaleString()}>${formatTimeAgo(customer.updatedAt, now.value)}</td>
     </tr>
   `;
 }

@@ -1,13 +1,13 @@
 import { signal, effect, batch } from "@preact/signals";
-import { createSeedEvents, createLiveEvent } from "../data/activity.js";
+import { createLiveEvent } from "../data/activity.js";
 import { persistedSignal } from "../lib/storage.js";
 import { liveUpdates } from "./settings-signals.js";
-import { accounts, updateAccount, SEED_VERSION } from "./accounts-signals.js";
+import { accounts, updateAccount, seedEvents, SEED_VERSION } from "./accounts-signals.js";
 
 const MAX_EVENTS = 40;
 const LOCK_NAME = "pulse:live-activity";
 
-export const events = persistedSignal(`events.${SEED_VERSION}`, createSeedEvents(accounts.value));
+export const events = persistedSignal(`events.${SEED_VERSION}`, seedEvents);
 
 // coarse clock so "5m ago" labels stay fresh without re-rendering every second
 export const now = signal(Date.now());

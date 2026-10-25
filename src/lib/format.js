@@ -107,14 +107,6 @@ export function formatTimeAgo(value, now = Date.now()) {
   return formatDate(value);
 }
 
-export function formatDaysAgo(days) {
-  if (days === 0) {
-    return "today";
-  }
-
-  return days === 1 ? "yesterday" : `${days}d ago`;
-}
-
 export function formatTimeUntil(value, now = Date.now()) {
   const days = Math.round((parseDate(value).getTime() - now) / DAY);
 

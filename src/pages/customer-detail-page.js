@@ -9,7 +9,7 @@ import { accounts, findAccount } from "../state/accounts-signals.js";
 import { events, now } from "../state/activity-signals.js";
 import { sortedCustomers, starredIds, notesById, toggleStar, addNote, removeNote } from "../state/customers-signals.js";
 import { showToast } from "../state/ui-signals.js";
-import { formatCurrency, formatCurrencyCompact, formatDate, formatDaysAgo, formatDelta, formatSignedCurrency, formatTimeAgo, formatTimeUntil } from "../lib/format.js";
+import { formatCurrency, formatCurrencyCompact, formatDate, formatDelta, formatSignedCurrency, formatTimeAgo, formatTimeUntil } from "../lib/format.js";
 import { usePage } from "../hooks/use-page.js";
 
 // prev/next follow the table's current sort and filters when the account is in it
@@ -196,7 +196,7 @@ export function CustomerDetailPage({ id }) {
           <div><dt>Region</dt><dd>${customer.region}</dd></div>
           <div><dt>Owner</dt><dd>${customer.owner}</dd></div>
           <div><dt>Customer since</dt><dd>${formatDate(customer.since)}</dd></div>
-          <div><dt>Last active</dt><dd>${formatDaysAgo(customer.lastActive)}</dd></div>
+          <div><dt>Last updated</dt><dd title=${new Date(customer.updatedAt).toLocaleString()}>${formatTimeAgo(customer.updatedAt, clock)}</dd></div>
         </dl>
       <//>
     </div>
